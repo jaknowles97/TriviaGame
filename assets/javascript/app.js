@@ -1,7 +1,8 @@
-const timelimit = 30;
+let timeLimit = 30;
 let correct = 0;
 let incorrect = 0;
 var currentQuestion = 0;
+var updateClock;
 
 var triviaData = {
     questions: ['What year was the Sega DreamCast realeased ?',
@@ -32,10 +33,32 @@ $(function () {
         } else if (screenName === "isWrong") {
             var incorrectHtml = "<h1> wrong, get ready for next question </h1>";
             $(".choices").html(incorrectHtml);
+        } else if(screenName === "timeUp") {
+            var timeHtml = "<h1> you didn't answer within the time limit!<h1>";
+            $(".choices").html(timeHtml);
+        }
+    }
+    var timer = function(prompt) {
+        if(prompt === "start") {
+            $(".timer").html("<h3>30 sec");
+            updateClock = setInterval( function() {
+                if(timeLimit > 0) {
+                    timeLimit--;
+                }
+                if(timeLimit <= 0) {
+                    screenMan("timeUp");
+                }
+                $(".timer").html("<h3>" +timeLimit+ " sec</h3>");
+            }, 1000);
+        }
+        if(prompt === "stop") {
+            clearInterval(updateClock);
+            
         }
     }
 
     var formGenerator = function (ques, choices) {
+        timer("start");
         $(".question").html("<div class='choice'>"+ques+"</div>");
         var choicesHtml = 
         "<div class='choice'>"+choices[0]+"</div>"+
@@ -52,6 +75,7 @@ $(function () {
     });
 
     var clickedChoice = $(document).on("click", ".choice", function() {
+        timer("stop");
         if($(this).text() === triviaData.answers[currentQuestion]) {
             screenMan("isRight");
             correct++;
@@ -61,9 +85,7 @@ $(function () {
         }
 
     });
-    var timer = function () {
-        var clock = setInterval(timelimit, 1000);
-    }
+
 
 
 
